@@ -1,4 +1,4 @@
-package com.teste.teste.controller;
+package com.teste.teste.testes;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
