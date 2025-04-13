@@ -2,33 +2,35 @@ package com.teste.teste.aplicacao.security;
 
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
-	private static final String SECRET_KEY = "seuSegredoUltraSecretoAqui";
+	private static final SecretKey SECRET_KEY = Keys
+			.hmacShaKeyFor("sua-chave-secreta-com-no-mínimo-32-caracteres!".getBytes());
+
 	private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 horas
 
 	public static String generateToken(String username) {
-		return Jwts.builder().setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
+		return Jwts.builder().setSubject(username).setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+				.signWith(SECRET_KEY, SignatureAlgorithm.HS256).compact();
 	}
 
 	public static String extractUsername(String token) {
-		return getClaims(token).getSubject();
+		return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody().getSubject();
 	}
 
 	public static boolean isTokenValid(String token) {
-		return !getClaims(token).getExpiration().before(new Date());
-	}
-
-	private static Claims getClaims(String token) {
-		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+		Date expiration = Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody()
+				.getExpiration();
+		return expiration.after(new Date());
 	}
 }
