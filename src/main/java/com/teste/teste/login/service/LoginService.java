@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import com.teste.teste.aplicacao.security.JwtUtil;
 import com.teste.teste.login.dto.LoginInput;
 import com.teste.teste.login.dto.LoginOutput;
-import com.teste.teste.login.dto.NovoUsuarioInput;
+import com.teste.teste.login.dto.TokenOutput;
+import com.teste.teste.login.dto.UsuarioInput;
+import com.teste.teste.login.dto.UsuarioOutput;
 import com.teste.teste.login.orm.UsuarioEntity;
 import com.teste.teste.login.repositorio.UsuarioRepositorioJpa;
 
@@ -19,7 +21,7 @@ public class LoginService {
 
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	public LoginOutput cadastrar(final NovoUsuarioInput input) {
+	public UsuarioOutput cadastrar(final UsuarioInput input) {
 		if (usuarioRepositorioJpa.findByEmail(input.email()).isPresent()) {
 			throw new RuntimeException("Usuário já existe");
 		}
@@ -30,7 +32,7 @@ public class LoginService {
 		usuarioEntity.setNome(input.nome());
 		usuarioEntity.setSenha(hashedPassword);
 		usuarioRepositorioJpa.save(usuarioEntity);
-		return login(new LoginInput(input.email(), input.senha()));
+		return usuarioEntity.toUsuarioOutput();
 	}
 
 	public LoginOutput login(final LoginInput input) {
@@ -41,9 +43,20 @@ public class LoginService {
 			throw new RuntimeException("Senha inválida");
 		}
 
-		String token = JwtUtil.generateToken(input.email()); // JWT aqui
+		String token = JwtUtil.generateAccessToken(input.email()); // JWT aqui
+		String refreshToken = JwtUtil.generateRefreshToken(input.email());
 
-		return new LoginOutput(token, usuarioEntity.getNome());
+		return new LoginOutput(usuarioEntity.getNome(), new TokenOutput(token, refreshToken));
+	}
+
+	public TokenOutput refreshAccessToken(String refreshToken) {
+		if (!JwtUtil.isTokenValid(refreshToken)) {
+			throw new RuntimeException("Refresh token inválido ou expirado");
+		}
+
+		String username = JwtUtil.extractUsername(refreshToken);
+
+		return new TokenOutput(JwtUtil.generateAccessToken(username), JwtUtil.generateRefreshToken(username));
 	}
 
 }

@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.teste.teste.login.dto.LoginInput;
 import com.teste.teste.login.dto.LoginOutput;
-import com.teste.teste.login.dto.NovoUsuarioInput;
+import com.teste.teste.login.dto.TokenInput;
+import com.teste.teste.login.dto.TokenOutput;
+import com.teste.teste.login.dto.UsuarioInput;
+import com.teste.teste.login.dto.UsuarioOutput;
 import com.teste.teste.login.service.LoginService;
 
 @RestController
@@ -20,8 +23,13 @@ public class LoginController {
 	private LoginService service;
 
 	@PostMapping("/register")
-	public ResponseEntity<LoginOutput> register(@RequestBody NovoUsuarioInput input) {
+	public ResponseEntity<UsuarioOutput> register(@RequestBody UsuarioInput input) {
 		return ResponseEntity.ok(service.cadastrar(input));
+	}
+
+	@PostMapping("/refresh")
+	public ResponseEntity<TokenOutput> refresh(@RequestBody TokenInput refreshToken) {
+		return ResponseEntity.ok(service.refreshAccessToken(refreshToken.refreshToken()));
 	}
 
 	@PostMapping("/login")
