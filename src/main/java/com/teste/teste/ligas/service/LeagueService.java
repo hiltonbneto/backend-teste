@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.teste.teste.ligas.dto.LeagueDTO;
+import com.teste.teste.ligas.dto.LeagueInput;
 import com.teste.teste.ligas.orm.League;
 import com.teste.teste.ligas.orm.Player;
 import com.teste.teste.ligas.repositorio.LeagueRepository;
@@ -23,7 +23,7 @@ public class LeagueService {
 		this.playerRepository = playerRepository;
 	}
 
-	public League createLeague(LeagueDTO dto) {
+	public League createLeague(LeagueInput dto) {
 		League league = new League();
 		league.setName(dto.getName());
 		league.setDate(LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));

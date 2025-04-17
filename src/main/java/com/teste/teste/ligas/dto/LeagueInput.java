@@ -2,7 +2,7 @@ package com.teste.teste.ligas.dto;
 
 import java.util.List;
 
-public class LeagueDTO {
+public class LeagueInput {
 	private String name;
 	private String date; // formato "dd/MM/yyyy"
 	private String numberPlayer;

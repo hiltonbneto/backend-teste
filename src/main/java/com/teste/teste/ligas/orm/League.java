@@ -1,11 +1,15 @@
 package com.teste.teste.ligas.orm;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
+import com.teste.teste.ligas.dto.LeagueOutput;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -30,11 +34,10 @@ public class League {
 
 	private String status;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "league_player", joinColumns = @JoinColumn(name = "league_id"), inverseJoinColumns = @JoinColumn(name = "player_id"))
 	private List<Player> players;
 
-	// Constructors
 	public League() {
 	}
 
@@ -101,5 +104,10 @@ public class League {
 
 	public void setPlayers(List<Player> players) {
 		this.players = players;
+	}
+
+	public LeagueOutput toOutput() {
+		return new LeagueOutput(id, name, date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+				String.valueOf(numberPlayer), format, status);
 	}
 }
