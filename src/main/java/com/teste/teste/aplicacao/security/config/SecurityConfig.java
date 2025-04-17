@@ -16,7 +16,8 @@ public class SecurityConfig {
 	@SuppressWarnings("removal")
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-		http.csrf().disable()
+		http.cors().and()
+        .csrf().disable()
 				.authorizeHttpRequests(
 						auth -> auth.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
